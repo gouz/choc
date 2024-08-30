@@ -13,7 +13,7 @@
     "choc": "./bin/index.js"
   },
   "scripts": {
-    "make": "bun build src/index.ts --outfile exe/choc --compile --minify --sourcemap=none"
+    "make": "bun build src/index.ts --outfile exe/choc --compile --minify"
   },
   "dependencies": {
     "commander": "^12.0.0"

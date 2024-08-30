@@ -209,14 +209,14 @@ window.sortCol = (colName) => {
 
 window.filterTalks = () => {
   const articles = document.querySelectorAll(".talk");
-  articles.forEach((article) => {
+  articles.forEach((article, _) => {
     article.classList.remove("hidden");
   });
 
-  ["categories", "formats", "speakers", "companies"].forEach((key) => {
+  ["categories", "formats", "speakers", "companies"].forEach((key, _) => {
     const choice = document.getElementById(key).value.trim();
     if (choice !== "")
-      articles.forEach((article) => {
+      articles.forEach((article, _) => {
         if (article.getAttribute(`data-${key}`).indexOf(` ${choice} `) === -1)
           article.classList.add("hidden");
       });
