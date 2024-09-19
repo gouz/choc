@@ -136,3 +136,5 @@ exe/
 .scannerwork
 
 .DS_Store
+
+tmp

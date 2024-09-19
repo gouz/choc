@@ -1,15 +1,7 @@
 #!/usr/bin/env bun
-import { CommanderError, program } from "commander";
+import { program } from "commander";
 import packagejson from "../package.json";
 import choc from "./choc";
-
-function myParseInt(value: string) {
-  const parsedValue = parseInt(value, 10);
-  if (isNaN(parsedValue)) {
-    throw new CommanderError(0, "nan", "Not a number.");
-  }
-  return parsedValue;
-}
 
 program
   .name("choc")
@@ -23,10 +15,7 @@ program
   .option("-e, --with-companies", "view speakers company", false)
   .option("-a, --with-addresses", "view speakers address", false)
   .option("-l, --with-languages", "view talks language", false)
-  .option("-t, --titlelength <int>", "the title length", myParseInt, 100)
   .option("-w, --links <eventId>", "view links")
-  .option("-x, --export <file>", "export into tsv file")
-  .option("-r, --render", "render on a webpage", false)
   .option("-p, --compact", "compact render on a webpage", false)
   .action(choc);
 

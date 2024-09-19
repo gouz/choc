@@ -1,56 +1,66 @@
-export type TalkRow = {
-  position?: number;
-  title?: string;
-  format?: string;
-  categories?: string;
-  speakers?: string;
-  rating?: number;
-  loves?: number;
-  hates?: number;
-};
-
-export type Format = {
+export type ConferenceHallFormat = {
   id: string;
   name: string;
+  description: string | null;
+  migrationId: string;
+  eventId: string;
 };
 
-export type Speaker = {
-  uid: string;
-  displayName: string;
-  company: string;
-  address: Address;
-};
-
-export type SpeakerData = {
+export type ConferenceHallCategory = {
+  id: string;
   name: string;
-  company: string;
-  address: string;
+  description?: string | null;
+  migrationId?: string;
+  eventId?: string;
 };
 
-export type Address {
-  formattedAddress: string;
-}
+export type ConferenceHallSpeaker = {
+  name: string;
+  bio: string | null;
+  company: string | null;
+  references: string | null;
+  picture: string | null;
+  location: string | null;
+  email: string | null;
+  socials: { [key: string]: string };
+};
 
-export type Talk = {
+export type ConferenceHallTalk = {
   id: string;
   title: string;
-  speakers: string[];
-  formats: string;
-  categories: string;
-  rating: number;
-  loves: number;
-  hates: number;
-  language: string;
+  abstract: string | null;
+  deliberationStatus: string | null;
+  confirmationStatus: string | null;
+  level: string;
+  references: string | null;
+  formats: ConferenceHallFormat[];
+  categories: ConferenceHallCategory[];
+  languages: string[];
+  speakers?: ConferenceHallSpeaker[];
+  reviews?: {
+    average?: number;
+    positives?: number;
+    negatives?: number;
+  };
 };
 
-export type Options = {
-  withCategories: boolean;
-  withCompanies: boolean;
-  withFormats: boolean;
-  withLanguages: boolean;
-  withAddresses: boolean;
-  titlelength: number;
-  render: boolean;
-  links?: string;
-  export?: string;
+export type TalkRow = {
+  title?: string;
+  abstract?: string | null;
+  format?: string;
+  category?: string;
+  speakers?: {
+    name: string;
+    company: string | null;
+    location: string | null;
+    picture: string | null;
+  }[];
+  rating?: number;
+  positives?: number;
+  negatives?: number;
+  deliberationStatus?: string | null;
+  confirmationStatus?: string | null;
+  level?: string;
+  languages?: string[];
+  link?: string;
 };
