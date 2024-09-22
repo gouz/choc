@@ -1,6 +1,6 @@
-import type { ConferenceHallTalk, TalkRow } from "./types";
+import type { ConferenceHallTalk, Options, TalkRow } from "./types";
 
-export const DTO = (talks: ConferenceHallTalk[]): TalkRow[] =>
+export const DTO = (talks: ConferenceHallTalk[], options: Options): TalkRow[] =>
   talks.map((talk) => ({
     id: talk.id,
     title: talk.title,
@@ -20,5 +20,7 @@ export const DTO = (talks: ConferenceHallTalk[]): TalkRow[] =>
     confirmationStatus: talk.confirmationStatus,
     level: talk.level,
     languages: talk.languages,
-    link: `https://conference-hall.io/organizer/event/${Bun.env.EVENTID}/proposals/${talk.id}`,
+    link: options.links
+      ? `https://conference-hall.io/organizer/event/${options.links}/proposals/${talk.id}`
+      : "",
   }));

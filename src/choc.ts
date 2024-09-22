@@ -6,7 +6,7 @@ import css from "./render/main.css" with { type: "text" };
 import type { Options } from "./types.js";
 
 const choc = async (file: string, options: Options) => {
-  const talks = DTO(await Bun.file(file).json());
+  const talks = DTO(await Bun.file(file).json(), options);
   const server = Bun.serve({
     port: 1337,
     async fetch(req) {

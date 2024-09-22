@@ -43,18 +43,15 @@ Arguments:
   json                     the json export file from Conference Hall
 
 Options:
-  -v, --version            output the version number
-  -c, --with-categories    view categories (default: false)
-  -f, --with-formats       view formats (default: false)
-  -e, --with-companies     view speakers company (default: false)
-  -a, --with-addresses     view speakers address (default: false)
-  -l, --with-languages     view talks language (default: false)
-  -t, --titlelength <int>  the title length (default: 100)
-  -w, --links <eventId>    view links
-  -x, --export <file>      export into tsv file
-  -r, --render             render on a webpage (default: false)
-  -p, --compact            compact render on a webpage (default: false)
-  -h, --help               display help for command
+  -v, --version          output the version number
+  -c, --with-categories  view categories (default: false)
+  -f, --with-formats     view formats (default: false)
+  -e, --with-companies   view speakers company (default: false)
+  -a, --with-addresses   view speakers address (default: false)
+  -t, --with-languages   view talks language (default: false)
+  -l, --links <eventId>  view links
+  -p, --compact          compact render (default: false)
+  -h, --help             display help for command
 ```
 
 ### Default usage

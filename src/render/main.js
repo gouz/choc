@@ -60,7 +60,7 @@ const joliTalk = (talk) => `
     .map((s) => s.company)
     .join(" ")} ">
     <header>
-        <a href="${`https://conference-hall.io/organizer/event/@TODO/proposals/${talk.id}`}">${linkIcon}</a>
+        ${talk.link !== "" ? `<a href="${talk.link}">${linkIcon}</a>` : ""}
         <h3>${talk.title}</h3>
     </header>
     <div class="info">
@@ -91,7 +91,7 @@ const rowTalk = (talk) => `
   )} " data-companies=" ${talk.speakers
     .map((s) => s.company)
     .join(" ")} ">
-  <td>${talk.title}</td>
+  <td>${talk.link !== "" ? `<a href="${talk.link}">${linkIcon}</a>` : ""}${talk.title}</td>
   <td class="format">${talk.format}</td>
   <td class="category">${talk.category}</td>
   <td class="speakers">${talk.speakers.map((s) => s.name).join("<br />")}</td>
