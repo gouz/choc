@@ -54,36 +54,12 @@ Options:
   -h, --help             display help for command
 ```
 
-### Default usage
-
-```sh
-choc export.json
-```
-
-![alt text](assets/default.png)
-
-### With options
-
-```sh
-choc -fce export.json
-```
-
-![alt text](assets/options.png)
-
-### Export to a tsv file
-
-Then you can import it into a spreadsheet
-
-```sh
-choc export.json -x export.tsv
-```
-
 ### Web mode
 
 **choc** is built with a webserver inside to transform you json into a nice webpage with filters.
 
 ```
-choc export.json -r
+choc export.json
 ```
 
 You can add links to the talks with the `-w, --links`.
@@ -91,13 +67,13 @@ You can add links to the talks with the `-w, --links`.
 You need to write your event id, present in the URL in conference-hall.io .
 
 ```
-choc export.json -rw 688i5iout
+choc export.json -rl 688i5iout
 ```
 
 ### Organizer most popular command
 
 ```
-choc export.json -flecarpw 688i5iout
+choc export.json -flecarpl 688i5iout
 ```
 
 or (without links)
