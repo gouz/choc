@@ -54,9 +54,9 @@ const joliSpeaker = (speaker) => `
 const joliTalk = (talk) => `
   <article class="talk" data-categories=" ${talk.category} " data-formats=" ${
     talk.format
-  } " data-speakers=" ${talk.speakers.map(s => s.name).join(
-    " ",
-  )} " data-companies=" ${talk.speakers
+  } " data-speakers=" ${talk.speakers
+    .map((s) => s.name)
+    .join(" ")} " data-companies=" ${talk.speakers
     .map((s) => s.company)
     .join(" ")} ">
     <header>
@@ -66,9 +66,7 @@ const joliTalk = (talk) => `
     <div class="info">
         <div class="abstract">${converter.makeHtml(talk.abstract)}</div>
         <div class="speakers">
-            ${talk.speakers
-              .map((speaker) => joliSpeaker(speaker))
-              .join("")}
+            ${talk.speakers.map((speaker) => joliSpeaker(speaker)).join("")}
         </div>
     </div>
     <footer>
@@ -85,11 +83,54 @@ const joliTalk = (talk) => `
   </article>
 `;
 
-document.getElementById("talks").innerHTML = talks
+const rowTalk = (talk) => `
+<tr class="talk" data-categories=" ${
+    talk.category
+  } " data-formats=" ${talk.format} " data-speakers=" ${talk.speakers.join(
+    " ",
+  )} " data-companies=" ${talk.speakers
+    .map((s) => s.company)
+    .join(" ")} ">
+  <td>${talk.title}</td>
+  <td class="format">${talk.format}</td>
+  <td class="category">${talk.category}</td>
+  <td class="speakers">${talk.speakers.map((s) => s.name).join("<br />")}</td>
+  <td class="companies">${talk.speakers.map((s) => s.company ?? "").join("<br />")}</td>
+  <td class="addresses">${talk.speakers.map((s) => s.location ?? "").join("<br />")}</td>
+  <td class="languages">${talk.language ?? ""}</td>
+  <td class="rating">${talk.rating?.toFixed(2) ?? "-"}</td>
+  <td class="positives">${talk.positives}</td>
+  <td class="negatives">${talk.negatives}</td>
+</tr>
+`;
+
+const htmlTalks = talks
   .sort((a, b) => (a.rating <= b.rating ? 1 : -1))
   .map((talk, i) => ({ ...talk, position: i + 1 }))
-  .map((talk) => joliTalk(talk))
+  .map((talk) => (options.compact ? rowTalk(talk) : joliTalk(talk)))
   .join("");
+
+document.getElementById("talks").innerHTML = options.compact
+  ? `
+<table>
+  <thead>
+    <th>Titles</th>
+    <th class="format">Formats</th>
+    <th class="category">Categories</th>
+    <th class="speakers">Speakers</th>
+    <th class="companies">Companies</th>
+    <th class="addresses">Addresses</th>
+    <th class="languages">Languages</th>
+    <th class="rating">Rating</th>
+    <th class="positives">Positives</th>
+    <th class="negatives">Negatives</th>
+  </thead>
+  <tbody>
+    ${htmlTalks}
+  </tbody>
+</table>
+`
+  : htmlTalks;
 
 window.filterTalks = () => {
   const articles = document.querySelectorAll(".talk");
@@ -106,4 +147,3 @@ window.filterTalks = () => {
       });
   });
 };
-  

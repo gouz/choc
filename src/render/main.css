@@ -94,3 +94,8 @@ footer {
 th {
   cursor: s-resize;
 }
+
+
+.category, .companies, .format, .languages, .addresses {
+  display: none;
+}

@@ -14,9 +14,9 @@ program
   .option("-f, --with-formats", "view formats", false)
   .option("-e, --with-companies", "view speakers company", false)
   .option("-a, --with-addresses", "view speakers address", false)
-  .option("-l, --with-languages", "view talks language", false)
-  .option("-w, --links <eventId>", "view links")
-  .option("-p, --compact", "compact render on a webpage", false)
+  .option("-t, --with-languages", "view talks language", false)
+  .option("-l, --links <eventId>", "view links")
+  .option("-p, --compact", "compact render", false)
   .action(choc);
 
 program.showHelpAfterError();

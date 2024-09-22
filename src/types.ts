@@ -64,3 +64,15 @@ export type TalkRow = {
   languages?: string[];
   link?: string;
 };
+
+export type Options = {
+  withCategories: boolean;
+  withCompanies: boolean;
+  withFormats: boolean;
+  withLanguages: boolean;
+  withAddresses: boolean;
+  titlelength: number;
+  render: boolean;
+  links?: string;
+  export?: string;
+};

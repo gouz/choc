@@ -1,22 +1,35 @@
+import open from "open";
 import { DTO } from "./DTO";
 import html from "./render/index.html" with { type: "text" };
 import js from "./render/main.js" with { type: "text" };
 import css from "./render/main.css" with { type: "text" };
+import type { Options } from "./types.js";
 
-const choc = async (file: string) => {
+const choc = async (file: string, options: Options) => {
   const talks = DTO(await Bun.file(file).json());
   const server = Bun.serve({
     port: 1337,
     async fetch(req) {
       const path = new URL(req.url).pathname;
       if (path === "/main.css")
-        return new Response(css, {
-          headers: { "content-type": "text/css" },
-        });
+        return new Response(
+          `
+${css}
+${options.withAddresses ? ".addresses {display: table-cell;}" : ""}
+${options.withLanguages ? ".languages {display: table-cell;}" : ""}
+${options.withFormats ? ".format {display: table-cell;}" : ""}
+${options.withCompanies ? ".companies {display: table-cell;}" : ""}
+${options.withCategories ? ".category {display: table-cell;}" : ""}
+`,
+          {
+            headers: { "content-type": "text/css" },
+          },
+        );
       if (path === "/main.js")
         return new Response(
           `
-          const talks = ${JSON.stringify(talks).replaceAll("\n", "<br>")}
+          const talks = ${JSON.stringify(talks).replaceAll("\n", "<br>")};
+          const options = ${JSON.stringify(options)};
           ${js}
           `.trim(),
           {
@@ -36,6 +49,7 @@ const choc = async (file: string) => {
   });
 
   console.log("🍫 is listening on \x1b[1m\x1b[35;49m%s\x1b[0m", server.url);
+  open(server.url.toString());
 };
 
 export default choc;

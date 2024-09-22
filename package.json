@@ -19,6 +19,7 @@
     "lint": "bunx @biomejs/biome lint ./ --write"
   },
   "dependencies": {
-    "commander": "^12.1.0"
+    "commander": "^12.1.0",
+    "open": "^10.1.0"
   }
 }
