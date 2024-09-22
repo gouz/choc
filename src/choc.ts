@@ -1,60 +1,55 @@
-import { DTO, DTOExport } from "./DTO";
-import render from "./render";
-import type {
-  Format,
-  Options,
-  Speaker,
-  SpeakerData,
-  Talk,
-  TalkRow,
-} from "./types";
+import open from "open";
+import { DTO } from "./DTO";
+import html from "./render/index.html" with { type: "text" };
+import js from "./render/main.js" with { type: "text" };
+import css from "./render/main.css" with { type: "text" };
+import type { Options } from "./types.js";
 
 const choc = async (file: string, options: Options) => {
-  const json = await Bun.file(file).json();
-  if (options.render) {
-    render(json, options);
-  } else {
-    const { talks, speakers, formats, categories } = json;
-    const formatsHash = new Map<string, string>();
-    (formats as Format[]).forEach(({ id, name }) => {
-      formatsHash.set(id, name);
-    });
-    const speakerHash = new Map<string, SpeakerData>();
-    (speakers as Speaker[]).forEach(
-      ({ uid, displayName, company, address }) => {
-        speakerHash.set(uid, {
-          name: displayName,
-          company: company ?? "",
-          address: address?.formattedAddress ?? "",
-        });
-      }
-    );
-    const categoriesHash = new Map<string, string>();
-    (categories as Format[]).forEach(({ id, name }) => {
-      categoriesHash.set(id, name);
-    });
-    const talksLines = (talks as Talk[]).sort((a, b) =>
-      a.rating <= b.rating ? 1 : -1
-    );
-    if (options.export) {
-      const exportLines = DTOExport(
-        talksLines,
-        options,
-        speakerHash,
-        formatsHash,
-        categoriesHash
-      );
-      Bun.write(
-        options.export,
-        `${Object.keys(exportLines[0]).join("\t")}\n${exportLines
-          .map((t: TalkRow) => Object.values(t).join("\t"))
-          .join("\n")}`
-      );
-    } else
-      console.table(
-        DTO(talksLines, options, speakerHash, formatsHash, categoriesHash)
-      );
-  }
+  const talks = DTO(await Bun.file(file).json());
+  const server = Bun.serve({
+    port: 1337,
+    async fetch(req) {
+      const path = new URL(req.url).pathname;
+      if (path === "/main.css")
+        return new Response(
+          `
+${css}
+${options.withAddresses ? ".addresses {display: table-cell;}" : ""}
+${options.withLanguages ? ".languages {display: table-cell;}" : ""}
+${options.withFormats ? ".format {display: table-cell;}" : ""}
+${options.withCompanies ? ".companies {display: table-cell;}" : ""}
+${options.withCategories ? ".category {display: table-cell;}" : ""}
+`,
+          {
+            headers: { "content-type": "text/css" },
+          },
+        );
+      if (path === "/main.js")
+        return new Response(
+          `
+          const talks = ${JSON.stringify(talks).replaceAll("\n", "<br>")};
+          const options = ${JSON.stringify(options)};
+          ${js}
+          `.trim(),
+          {
+            headers: {
+              "Content-Type": "application/javascript",
+            },
+            status: 200,
+          },
+        );
+      return new Response(html, {
+        headers: {
+          "Content-Type": "text/html",
+        },
+        status: 200,
+      });
+    },
+  });
+
+  console.log("🍫 is listening on \x1b[1m\x1b[35;49m%s\x1b[0m", server.url);
+  open(server.url.toString());
 };
 
 export default choc;
