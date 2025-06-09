@@ -1,0 +1,128 @@
+name: Build
+
+on:
+  push:
+    tags:
+      - "*"
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+
+jobs:
+  create_release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    environment: build
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+
+  build_release:
+    name: Build Release
+    needs: create_release
+    environment: build
+    outputs:
+      output_linux_amd: ${{ steps.compute_sha.outputs.output_LINUX_AMD_SHA }}
+      output_linux_arm: ${{ steps.compute_sha.outputs.output_LINUX_ARM_SHA }}
+      output_mac_amd: ${{ steps.compute_sha.outputs.output_MAC_AMD_SHA }}
+      output_mac_arm: ${{ steps.compute_sha.outputs.output_MAC_ARM_SHA }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            release_suffix: linux-amd
+            compile_options: --target=bun-linux-x64-modern
+            sha_field: LINUX_AMD_SHA
+          - os: ubuntu-latest
+            release_suffix: linux-arm
+            compile_options: --target=bun-linux-arm64
+            sha_field: LINUX_ARM_SHA
+          - os: macos-latest
+            release_suffix: mac
+            compile_options: --target=bun-darwin-arm64
+            sha_field: MAC_ARM_SHA
+          - os: macos-15
+            release_suffix: mac_intel
+            platform: x64
+            compile_options: --target=bun-darwin-x64
+            sha_field: MAC_AMD_SHA
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: oven-sh/setup-bun@v1
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - run: bun install
+      - run: bun make ${{ matrix.compile_options }}
+      - name: Rename release package
+        id: release_package
+        run: |
+            cat ./exe/choc > choc_${{ matrix.release_suffix }}
+      - name: Compress action step
+        uses: a7ul/tar-action@v1.2.0
+        id: compress
+        with:
+          command: c
+          cwd: .
+          files: |
+            ./choc_${{ matrix.release_suffix }}
+          outPath: ./choc_${{ matrix.release_suffix }}.tar.gz
+      - name: Compute sha
+        id: compute_sha
+        run: |
+            sha=($(shasum -a 256 ./choc_${{ matrix.release_suffix }}.tar.gz))
+            sha_value="${{ matrix.sha_field }}"
+            echo "output_${sha_value}=${{ matrix.sha_field }}-$sha" >> "$GITHUB_OUTPUT"
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ needs.create_release.outputs.tag-name }}
+          files: choc_${{ matrix.release_suffix }}.tar.gz
+          generate_release_notes: true
+
+  generate_packages:
+    name: Build packages file
+    needs: create_release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: oven-sh/setup-bun@v1
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - run: bun install
+      - run: bun make
+      - name: create sample script
+        run: |
+          mkdir -p .debpkg/usr/bin
+          cp -p exe/* .debpkg/usr/bin/
+      - name: build-deb-action
+        uses: jiro4989/build-deb-action@v3
+        with:
+          package: "choc"
+          desc: "ConferenceHall analyzer"
+          arch: "amd64"
+          package_root: ".debpkg"
+          maintainer: "Sylvain Gougouzian <sylvain@gougouzian.fr>"
+          version: ${{ github.ref_name }}
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ needs.create_release.outputs.tag-name }}
+          files: choc_${{ github.ref_name }}_amd64.deb
