@@ -126,3 +126,19 @@ jobs:
         with:
           tag_name: ${{ needs.create_release.outputs.tag-name }}
           files: choc_${{ github.ref_name }}_amd64.deb
+
+  update_brew_formula:
+    name: Update formula
+    runs-on: ubuntu-latest
+    needs: build_release
+    steps:
+      - name: Update formula
+        uses: yodamad-actions/brew-formula-update@0.5
+        with:
+          file: choc.rb
+          owner: gouz
+          repo: homebrew-tools
+          version: ${{ github.ref_name }}
+          fields: ${{ toJSON(needs.build_release.outputs) }}
+          token: ${{ secrets.BREW_TOKEN }}
+          auto_merge: true
